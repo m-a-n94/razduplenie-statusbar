@@ -22,6 +22,7 @@
       align-items: center;
       position: relative;
       width: 80%;
+      height: 150px;
     }
 
     .step {
@@ -29,7 +30,7 @@
       flex-direction: column;
       align-items: center;
       position: relative;
-      z-index: 1;
+      z-index: 2;
     }
 
     .step .circle {
@@ -46,7 +47,7 @@
       font-size: 18px;
       transition: background-color 0.3s ease, transform 0.3s ease;
       position: relative;
-      z-index: 2; /* Ensure circles are above the line */
+      z-index: 2;
     }
 
     .step.completed .circle {
@@ -74,20 +75,26 @@
       left: 25px; /* Matches circle radius */
       right: 25px; /* Matches circle radius */
       height: 4px;
-      background-color: #e0e0e0;
-      z-index: 0;
-      transition: background-color 0.3s ease;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      width: calc(100% - 50px);
     }
 
-    .step.completed ~ .line {
+    .line .segment {
+      height: 4px;
+      flex-grow: 1;
+    }
+
+    .step.completed ~ .line .segment {
       background-color: #9e9e9e; /* Gray for completed steps */
     }
 
-    .step.active ~ .line {
+    .step.active ~ .line .segment {
       background-color: #4caf50; /* Green for active steps */
     }
 
-    .step.future ~ .line {
+    .step.future ~ .line .segment {
       background-color: #2196f3; /* Blue for future steps */
     }
 
@@ -144,12 +151,20 @@
     <div class="circle">6</div>
     <span>Потемнело итсовер</span>
   </div>
-  <div class="line"></div>
+  <div class="line">
+    <div class="segment"></div>
+    <div class="segment"></div>
+    <div class="segment"></div>
+    <div class="segment"></div>
+    <div class="segment"></div>
+    <div class="segment"></div>
+  </div>
 </div>
 
 <script>
   // Set a random active step on page load
   const steps = document.querySelectorAll('.step');
+  const segments = document.querySelectorAll('.line .segment');
   const totalSteps = steps.length;
   const randomIndex = Math.floor(Math.random() * totalSteps);
 
@@ -163,6 +178,10 @@
       } else {
         step.classList.add('future');
       }
+    });
+
+    segments.forEach((segment, index) => {
+      segment.style.backgroundColor = index < activeIndex ? '#9e9e9e' : index === activeIndex ? '#4caf50' : '#2196f3';
     });
   }
 
