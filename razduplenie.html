@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Razduplenie</title>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f8f9fa;
+  }
+
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+    width: 80%;
+  }
+
+  .step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .step .circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #d3d3d3; /* Default color for future steps */
+    color: white;
+    font-weight: bold;
+    position: relative;
+    z-index: 1;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .step.active .circle {
+    background-color: #28a745; /* Green for active step */
+  }
+
+  .step.completed .circle {
+    background-color: #6c757d; /* Grey for completed steps */
+  }
+
+  .step .icon {
+    position: absolute;
+    top: -70px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: none;
+    cursor: grab;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .step.active .icon {
+    display: block;
+  }
+
+  .status-bar::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 20px; /* Matches circle radius */
+    right: 20px; /* Matches circle radius */
+    height: 4px;
+    background-color: #d3d3d3; /* Default color for future steps */
+    z-index: 0;
+  }
+
+  .step::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(100% - 40px); /* Leaves space for circles */
+    height: 4px;
+    background-color: inherit; /* Inherit color from step */
+    z-index: -1;
+    transform: translateX(-50%);
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .step:first-child::before {
+    left: 50%;
+    width: calc(50% - 20px); /* Only extend to circle edge */
+  }
+
+  .step:last-child::before {
+    left: 0;
+    width: calc(50% - 20px); /* Only extend to circle edge */
+    transform: translateX(0);
+  }
+
+  .step.completed::before {
+    background-color: #6c757d; /* Grey for completed steps */
+  }
+
+  .step.active::before {
+    background-color: #28a745; /* Green for active steps */
+  }
+
+  .step + .step::before {
+    background-color: #007bff; /* Blue for future steps */
+  }
+
+  .step span {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="status-bar">
+  <div class="step completed">
+    <div class="circle">1</div>
+    <span>Покурим</span>
+  </div>
+  <div class="step completed">
+    <div class="circle">2</div>
+    <span>Поедим клубнику с чаем</span>
+  </div>
+  <div class="step active" draggable="true">
+    <div class="circle">3</div>
+    <img src="person.png" alt="Person Icon" class="icon" id="person" />
+    <span>Покурим</span>
+  </div>
+  <div class="step">
+    <div class="circle">4</div>
+    <span>Раздуплммся</span>
+  </div>
+  <div class="step">
+    <div class="circle">5</div>
+    <span>В туалет</span>
+  </div>
+  <div class="step">
+    <div class="circle">6</div>
+    <span>Потемнело итсовер</span>
+  </div>
+</div>
+
+<script>
+  const steps = document.querySelectorAll('.step');
+  let draggedElement = null;
+
+  document.querySelectorAll('.icon').forEach(icon => {
+    icon.addEventListener('dragstart', (event) => {
+      draggedElement = event.target;
+      event.dataTransfer.setData('text/plain', event.target.id);
+    });
+  });
+
+  steps.forEach((step, index) => {
+    step.addEventListener('dragover', (event) => {
+      event.preventDefault();
+    });
+
+    step.addEventListener('drop', (event) => {
+      event.preventDefault();
+      if (draggedElement) {
+        steps.forEach((s, i) => {
+          s.classList.remove('active');
+          s.classList.toggle('completed', i < index);
+        });
+
+        step.classList.add('active');
+        step.appendChild(draggedElement);
+        draggedElement.style.display = 'block';
+      }
+    });
+  });
+
+  function addPersonIcon(stepIndex, imageUrl = 'person.png') {
+    const step = steps[stepIndex];
+    const existingIcon = step.querySelector('.icon');
+
+    if (existingIcon) {
+      existingIcon.src = imageUrl;
+      existingIcon.style.display = 'block';
+      return;
+    }
+
+    const newIcon = document.createElement('img');
+    newIcon.src = imageUrl;
+    newIcon.alt = 'Person Icon';
+    newIcon.className = 'icon';
+    newIcon.draggable = true;
+    newIcon.addEventListener('dragstart', (event) => {
+      draggedElement = event.target;
+      event.dataTransfer.setData('text/plain', event.target.id);
+    });
+    step.appendChild(newIcon);
+  }
+
+  addPersonIcon(2, 'person2.png');
+  addPersonIcon(4, 'person3.png');
+</script>
+
+</body>
+</html>
