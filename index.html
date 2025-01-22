@@ -31,6 +31,7 @@
       align-items: center;
       position: relative;
       z-index: 2;
+      cursor: pointer;
     }
 
     .step .circle {
@@ -124,11 +125,11 @@
 <body>
 
 <div class="status-bar">
-  <div class="step completed">
+  <div class="step completed" draggable="true">
     <div class="circle">1</div>
     <span>Покурим</span>
   </div>
-  <div class="step completed">
+  <div class="step completed" draggable="true">
     <div class="circle">2</div>
     <span>Поедим клубнику с чаем</span>
   </div>
@@ -139,15 +140,15 @@
     </div>
     <span>Покурим</span>
   </div>
-  <div class="step future">
+  <div class="step future" draggable="true">
     <div class="circle">4</div>
     <span>Раздуплммся</span>
   </div>
-  <div class="step future">
+  <div class="step future" draggable="true">
     <div class="circle">5</div>
     <span>В туалет</span>
   </div>
-  <div class="step future">
+  <div class="step future" draggable="true">
     <div class="circle">6</div>
     <span>Потемнело итсовер</span>
   </div>
@@ -183,6 +184,16 @@
     segments.forEach((segment, index) => {
       segment.style.backgroundColor = index < activeIndex ? '#9e9e9e' : index === activeIndex ? '#4caf50' : '#2196f3';
     });
+
+    // Ensure the icon only shows for the active step
+    const icons = document.querySelectorAll('.step .icon');
+    icons.forEach((icon, index) => {
+      if (index === activeIndex) {
+        icon.style.display = 'block';
+      } else {
+        icon.style.display = 'none';
+      }
+    });
   }
 
   // Initialize with random active step
@@ -192,6 +203,38 @@
   steps.forEach((step, index) => {
     step.addEventListener('click', () => {
       updateStepStatus(index);
+    });
+  });
+
+  // Drag and Drop functionality
+  steps.forEach((step, index) => {
+    step.setAttribute('draggable', 'true');
+
+    step.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', index); // Store the index of the dragged element
+    });
+  });
+
+  // Allow steps to be dropped
+  steps.forEach((step, index) => {
+    step.addEventListener('dragover', (e) => {
+      e.preventDefault(); // Allow drop
+    });
+
+    step.addEventListener('drop', (e) => {
+      const draggedIndex = e.dataTransfer.getData('text/plain');
+      if (draggedIndex !== index) {
+        const draggedStep = steps[draggedIndex];
+        const targetStep = steps[index];
+
+        // Swap the positions of the dragged and dropped steps
+        const parent = draggedStep.parentNode;
+        const draggedBefore = targetStep.nextElementSibling === draggedStep ? targetStep : targetStep.nextElementSibling;
+        parent.insertBefore(draggedStep, draggedBefore);
+
+        // Recalculate step statuses after the drop
+        updateStepStatus(randomIndex);
+      }
     });
   });
 </script>
