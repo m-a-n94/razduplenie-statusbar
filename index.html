@@ -47,12 +47,16 @@
     }
 
     .step.completed .circle {
-      background-color: #4caf50; /* Green for completed steps */
+      background-color: #9e9e9e; /* Gray for completed steps */
     }
 
     .step.active .circle {
-      background-color: #2196f3; /* Blue for active step */
+      background-color: #4caf50; /* Green for active step */
       transform: scale(1.2);
+    }
+
+    .step.future .circle {
+      background-color: #2196f3; /* Blue for future steps */
     }
 
     .step span {
@@ -72,11 +76,15 @@
     }
 
     .step.completed ~ .line {
-      background-color: #4caf50; /* Green for completed steps */
+      background-color: #9e9e9e; /* Gray for completed steps */
     }
 
     .step.active ~ .line {
-      background-color: #2196f3; /* Blue for active steps */
+      background-color: #4caf50; /* Green for active steps */
+    }
+
+    .step.future ~ .line {
+      background-color: #2196f3; /* Blue for future steps */
     }
 
     .step .icon {
@@ -120,15 +128,15 @@
     </div>
     <span>Покурим</span>
   </div>
-  <div class="step">
+  <div class="step future">
     <div class="circle">4</div>
     <span>Раздуплммся</span>
   </div>
-  <div class="step">
+  <div class="step future">
     <div class="circle">5</div>
     <span>В туалет</span>
   </div>
-  <div class="step">
+  <div class="step future">
     <div class="circle">6</div>
     <span>Потемнело итсовер</span>
   </div>
@@ -136,15 +144,30 @@
 </div>
 
 <script>
+  // Set a random active step on page load
   const steps = document.querySelectorAll('.step');
+  const totalSteps = steps.length;
+  const randomIndex = Math.floor(Math.random() * totalSteps);
+
+  function updateStepStatus(activeIndex) {
+    steps.forEach((step, index) => {
+      step.classList.remove('completed', 'active', 'future');
+      if (index < activeIndex) {
+        step.classList.add('completed');
+      } else if (index === activeIndex) {
+        step.classList.add('active');
+      } else {
+        step.classList.add('future');
+      }
+    });
+  }
+
+  // Initialize with random active step
+  updateStepStatus(randomIndex);
 
   steps.forEach((step, index) => {
     step.addEventListener('click', () => {
-      // Update active step
-      steps.forEach((s, i) => {
-        s.classList.toggle('completed', i < index);
-        s.classList.toggle('active', i === index);
-      });
+      updateStepStatus(index);
     });
   });
 </script>
